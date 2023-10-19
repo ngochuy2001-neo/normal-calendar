@@ -20,15 +20,63 @@ let headerYear = present.getFullYear();
 
 let headerMonth = months[currentMonth];
 
+const addEventBtn = () => {
+  let dateElements = document.getElementsByClassName("day");
+  let selectedElements = null;
+  let dateBox = document.getElementById("dateBox")
+
+  Array.from(dateElements).forEach((element, index) => {
+    //check active days
+    let isActive = !element.classList.contains("inactive");
+
+    if(isActive){
+      element.addEventListener("click", (event) => {
+        const isSameElement = selectedElements === element
+        Array.from(dateElements).forEach((element) => {
+          element.classList.remove("active");
+        })
+        if(!isSameElement){
+          element.classList.add("active");
+          selectedElements = element;
+          dateBox.innerHTML = `${event.target.innerHTML}/${currentMonth + 1}/${headerYear}`;
+        } else{
+          dateBox.innerHTML = "";
+          selectedElements = null;
+        }
+
+        selectedDate = new Date(headerYear, currentMonth + 1, parseInt(event.target.innerHTML));
+      });
+    } else{
+      if(index < 6){
+        element.addEventListener("click", (event) => {
+          currentMonth -= 1;
+          if (currentMonth < 0){
+            currentMonth = 11;
+            headerYear -= 1;
+          }
+          renderCalendar(currentMonth, headerYear)
+        })
+      } else{
+        element.addEventListener("click", (event) => {
+          currentMonth += 1;
+          if (currentMonth > 11){
+            currentMonth = 0;
+            headerYear += 1;
+          }
+          renderCalendar(currentMonth, headerYear);
+        })
+      }
+    }
+  })
+}
+
+//Main part calendar function
 const renderCalendar = (month, year) => {
-  console.log(months[month], year)
   let curMonthStart = new Date(year, month, 1).getDay();
   let curMonthLast = new Date(year, month + 1, 0).getDay();
   let curMonthLastDate = new Date(year, month + 1, 0).getDate();
   let prevMonthLastDate = new Date(year, month, 0).getDate();
 
-
-  console.log(month)
   document.getElementById("calendarCurrentDate").innerHTML = months[month] + ", " + year;
   let calendar = ''
   let calendarElement = document.getElementById("dayList"); 
@@ -42,6 +90,7 @@ const renderCalendar = (month, year) => {
     calendar += `<li class="day inactive">${i - curMonthLast + 1}</li>`
   }
   calendarElement.innerHTML = calendar;
+  addEventBtn();
 }
 
 renderCalendar(currentMonth, headerYear);
@@ -49,56 +98,33 @@ renderCalendar(currentMonth, headerYear);
 let nextMonthBtn = document.getElementById("nextMonth");
 let previousMonthBtn = document.getElementById("previousMonth");
 
+//Button event listener
+
+//Next month
 nextMonthBtn.addEventListener("click", () => {
   currentMonth += 1;
   if(currentMonth > 11){
     currentMonth = 0;
     headerYear += 1;
   }
-  console.log(currentMonth)
   renderCalendar(currentMonth, headerYear);
   addEventBtn();
 })
 
+//Previous Month
 previousMonthBtn.addEventListener("click", ()=>{
   currentMonth -= 1;
   if(currentMonth < 0){
     currentMonth = 11;
     headerYear -= 1;
   }
-  console.log(currentMonth)
   renderCalendar(currentMonth, headerYear);
   addEventBtn();
 })
 
+let selectedDate = new Date()
 
-const addEventBtn = () => {
-  let dateElements = document.getElementsByClassName("day");
-  let selectedDate = new Date()
-  let selectedElements = null;
-  let dateBox = document.getElementById("dateBox")
-
-  Array.from(dateElements).forEach((element) => {
-    element.addEventListener("click", (event) => {
-      const isSameElement = selectedElements === element
-      Array.from(dateElements).forEach((element) => {
-        element.classList.remove("active");
-      })
-
-      if(!isSameElement){
-        element.classList.add("active");
-        selectedElements = element;
-        dateBox.innerHTML = `${event.target.innerHTML}/${currentMonth}/${headerYear}`;
-      }
-      else{
-        dateBox.innerHTML = "";
-        selectedElements = null;
-      }
-
-      selectedDate = new Date(headerYear, currentMonth, parseInt(event.target.innerHTML));
-      console.log(element.classList)
-    });
-  })
-}
+//Event function
 
 addEventBtn();
+
